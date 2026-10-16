@@ -2,8 +2,8 @@
 
 import { Link, useLocation } from "@tanstack/react-router";
 import {
-  IconHouse,
   IconCircleQuestion,
+  IconHouse,
   IconSparkle,
   IconSquareFeather,
 } from "nucleo-glass";
@@ -16,29 +16,44 @@ import {
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/", icon: <IconHouse size={18} />, label: "Home" },
+  {
+    href: "/",
+    icon: <IconHouse aria-hidden size={18} uniqueId="nav-home" />,
+    label: "Home",
+  },
   {
     href: "/about",
-    icon: <IconCircleQuestion size={18} />,
+    icon: <IconCircleQuestion aria-hidden size={18} uniqueId="nav-about" />,
     label: "About",
   },
   {
     href: "/skill",
-    icon: <IconSparkle size={18} />,
+    icon: <IconSparkle aria-hidden size={18} uniqueId="nav-skill" />,
     label: "Skill",
   },
   {
     href: "/blog",
-    icon: <IconSquareFeather size={18} />,
+    icon: <IconSquareFeather aria-hidden size={18} uniqueId="nav-blog" />,
     label: "Blog",
   },
 ];
 
+/**
+ * nucleo-glass icons read `--nc-gradient-1-color-*` instead of currentColor,
+ * so tone has to be driven through those custom properties. Keep these as
+ * literal strings, Tailwind cannot see classes built by concatenation.
+ */
+const iconToneActive =
+  "[--nc-gradient-1-color-1:var(--foreground)] [--nc-gradient-1-color-2:color-mix(in_oklab,var(--foreground),#000_30%)]";
+
+const iconToneHover =
+  "group-hover:[--nc-gradient-1-color-1:var(--foreground)] group-hover:[--nc-gradient-1-color-2:color-mix(in_oklab,var(--foreground),#000_30%)]";
+
 const isActive = (currentPath: string, targetHref: string) => {
-  if (targetHref === "/blog") {
-    return currentPath.startsWith("/blog");
+  if (targetHref === "/") {
+    return currentPath === "/";
   }
-  return currentPath === targetHref;
+  return currentPath === targetHref || currentPath.startsWith(`${targetHref}/`);
 };
 
 const CornerBracket = ({
@@ -56,16 +71,17 @@ const CornerBracket = ({
   };
 
   const borderStyles = {
-    "bottom-left": "border-b-2 border-l-2 rounded-bl-[1px]",
-    "bottom-right": "border-b-2 border-r-2 rounded-br-[1px]",
-    "top-left": "border-t-2 border-l-2 rounded-tl-[1px]",
-    "top-right": "border-t-2 border-r-2 rounded-tr-[1px]",
+    "bottom-left": "rounded-bl-[1px] border-b-2 border-l-2",
+    "bottom-right": "rounded-br-[1px] border-b-2 border-r-2",
+    "top-left": "rounded-tl-[1px] border-l-2 border-t-2",
+    "top-right": "rounded-tr-[1px] border-r-2 border-t-2",
   };
 
   return (
     <div
+      aria-hidden
       className={cn(
-        "absolute h-2 w-2",
+        "pointer-events-none absolute size-2",
         colorClass,
         positioning[position],
         borderStyles[position]
@@ -75,58 +91,65 @@ const CornerBracket = ({
 };
 
 const Navigations = () => {
-  const pathname = useLocation({ select: (s) => s.pathname });
+  const pathname = useLocation({ select: (location) => location.pathname });
+
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex h-fit flex-col p-0.75 sm:p-0.5 border border-dashed  dark:border-border-secondary justify-center items-center backdrop-blur-xl">
-      <div className="border-border-secondary bg-white dark:bg-zinc-950">
-        <div className="flex flex-row p-2 gap-7">
+    <nav
+      aria-label="Primary"
+      className="fixed bottom-4 left-1/2 z-40 flex h-fit -translate-x-1/2 flex-col items-center justify-center border border-dashed border-border-tertiary p-1 backdrop-blur-xl sm:p-0.5"
+    >
+      <div className="bg-bg-base">
+        <div className="flex flex-row gap-7 p-2">
           {navItems.map((item) => {
             const active = isActive(pathname, item.href);
+
             return (
-              <Tooltip key={item.label}>
+              <Tooltip key={item.href}>
                 <TooltipTrigger asChild>
                   <Link
-                    className="group relative flex size-8 flex-col items-center justify-center outline-none transition-all duration-300"
-										to={item.href}
-										preload="render"
+                    aria-current={active ? "page" : undefined}
+                    aria-label={item.label}
+                    className="group relative flex size-8 flex-col items-center justify-center outline-none transition-all duration-300 focus-visible:ring-1 focus-visible:ring-ring"
+                    preload="intent"
+                    to={item.href}
                   >
-                    {/* Active State Corners */}
                     {active ? (
                       <>
                         <CornerBracket
+                          colorClass="border-foreground"
                           position="top-left"
-                          colorClass="border-foreground"
                         />
                         <CornerBracket
+                          colorClass="border-foreground"
                           position="top-right"
-                          colorClass="border-foreground"
                         />
                         <CornerBracket
+                          colorClass="border-foreground"
                           position="bottom-left"
-                          colorClass="border-foreground"
                         />
                         <CornerBracket
-                          position="bottom-right"
                           colorClass="border-foreground"
+                          position="bottom-right"
                         />
                       </>
                     ) : (
-                      <div className="absolute inset-0 rounded-[1px] border border-muted-foreground/10 dark:border-border-secondary transition-colors group-hover:border-border" />
+                      <div className="absolute inset-0 rounded-[1px] border border-muted-foreground/10 transition-colors group-hover:border-border dark:border-border-secondary" />
                     )}
 
                     <span
+                      aria-hidden
                       className={cn(
                         "relative z-10 transition-all duration-300",
                         active
-                          ? "scale-110 text-foreground drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                          : "text-muted-foreground group-hover:text-foreground"
+                          ? `${iconToneActive} scale-110 drop-shadow-[0_0_8px_var(--icon-glow)]`
+                          : iconToneHover
                       )}
                     >
                       {item.icon}
                     </span>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="hidden sm:block">
+                <TooltipContent className="hidden sm:block" side="top">
                   <p>{item.label}</p>
                 </TooltipContent>
               </Tooltip>
@@ -134,7 +157,7 @@ const Navigations = () => {
           })}
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 

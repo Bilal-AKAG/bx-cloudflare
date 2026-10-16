@@ -1,7 +1,7 @@
 export const getGithubData = async () => {
   try {
     const res = await fetch(
-      "https://github-contributions-api.jogruber.de/v4/Bilal-AKAG?y=last"
+      "https://github-contributions-api.jogruber.de/v4/Bilal-AKAG?y=last",
     );
 
     if (!res.ok) {

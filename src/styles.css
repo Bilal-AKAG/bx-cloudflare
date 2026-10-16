@@ -63,6 +63,14 @@
 	--contrib-3: #5e666e;
 	--contrib-4: #24292f;
 	--icon-gray: #71717a;
+	--icon-glow: rgb(24 24 27 / 0.22);
+
+	/* nucleo-glass icons paint through these vars, never currentColor */
+	--nc-gradient-1-color-1: #52525b;
+	--nc-gradient-1-color-2: color-mix(in oklab, #52525b, #000 30%);
+	--nc-gradient-2-color-1: #e3e3e399;
+	--nc-gradient-2-color-2: #bbbbc099;
+	--nc-light: #ffffff;
 }
 
 .dark {
@@ -114,6 +122,13 @@
 	--contrib-3: #a8a8a8;
 	--contrib-4: #ffffff;
 	--icon-gray: #71717a;
+	--icon-glow: rgb(250 250 250 / 0.1);
+
+	--nc-gradient-1-color-1: #b0b0ba;
+	--nc-gradient-1-color-2: color-mix(in oklab, #b0b0ba, #000 18%);
+	--nc-gradient-2-color-1: #ffffff1f;
+	--nc-gradient-2-color-2: #ffffff0e;
+	--nc-light: #d4d4d8;
 }
 
 @theme inline {
